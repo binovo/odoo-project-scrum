@@ -69,16 +69,12 @@ class Task(models.Model):
             {
                 "task_id": self.id,
                 "planned_hours": self.planned_hours_latest,
-                "stage_id": (
-                    self.project_id.stage_id.id
-                    if self.env.user.has_group("project.group_project_stages")
-                    else False
-                ),
+                "stage_id": self.stage_id.id,
             }
         )
         return {
-            "name": _("Update task %(task_name)s estimation")
-            % {"task_name": self.name},
+            "name": _("Update task %(task_id)s - %(task_name)s estimation")
+            % {"task_id": self.id, "task_name": self.name},
             "view_mode": "form",
             "res_model": "task.estimation.update.wizard",
             "res_id": wizard.id,

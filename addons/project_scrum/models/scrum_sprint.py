@@ -124,6 +124,39 @@ class SprintTask(models.Model):
             )
         return users
 
+    @api.model
+    def web_read_group(
+        self,
+        domain,
+        fields,
+        groupby,
+        limit=None,
+        offset=0,
+        orderby=False,
+        lazy=True,
+        expand=False,
+        expand_limit=None,
+        expand_orderby=False,
+    ):
+        result = super().web_read_group(
+            domain,
+            fields,
+            groupby,
+            limit=limit,
+            offset=offset,
+            orderby=orderby,
+            lazy=lazy,
+            expand=expand,
+            expand_limit=expand_limit,
+            expand_orderby=expand_orderby,
+        )
+        groupby_name = groupby[0].split(":")[0] if groupby else None
+        if groupby_name == "user_id":
+            for group in result["groups"]:
+                if not group.get("user_id"):
+                    group["__fold"] = False
+        return result
+
     def action_edit_task(self):
         return {
             "type": "ir.actions.act_window",

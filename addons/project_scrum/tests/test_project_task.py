@@ -93,3 +93,15 @@ class TestProjectTask(TransactionCase):
             set(action["domain"][0][2]),
             set((self.open_sprint | self.closed_sprint).ids),
         )
+
+    def test_update_estimation_wizard_defaults_to_task_stage(self):
+        """The wizard stage is the related task stage."""
+        task = self._create_task("Estimate")
+        sprint_task = self._add_task_to_sprint(self.open_sprint, task)
+
+        action = sprint_task.action_update_estimation()
+        wizard = self.env["task.estimation.update.wizard"].browse(action["res_id"])
+
+        self.assertEqual(wizard.stage_id, task.stage_id)
+        self.assertIn(str(task.id), action["name"])
+        self.assertIn(task.name, action["name"])

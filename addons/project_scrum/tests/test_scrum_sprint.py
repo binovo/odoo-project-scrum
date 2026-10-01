@@ -114,3 +114,26 @@ class TestScrumSprint(TransactionCase):
         self.assertTrue(copy.name.startswith("SCRUM/"))
         self.assertNotEqual(copy.name, sprint.name)
         self.assertNotEqual(copy.name, "New")
+
+    def test_unassigned_kanban_group_is_not_folded(self):
+        """The None column of the sprint task kanban starts unfolded."""
+        task = self.env["project.task"].create(
+            {"name": "Unassigned", "project_id": self.project.id}
+        )
+        sprint = self._create_sprint(
+            sprint_task_ids=[(0, 0, {"task_id": task.id})],
+        )
+
+        result = (
+            self.env["scrum.sprint.task"]
+            .with_context(active_model="scrum.sprint", active_id=sprint.id)
+            .web_read_group(
+                [("sprint_id", "=", sprint.id)],
+                ["user_id"],
+                ["user_id"],
+            )
+        )
+        none_groups = [group for group in result["groups"] if not group.get("user_id")]
+
+        self.assertTrue(none_groups)
+        self.assertFalse(none_groups[0]["__fold"])

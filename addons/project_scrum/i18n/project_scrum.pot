@@ -1455,7 +1455,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/project_scrum/models/project_task.py:0
 #, python-format
-msgid "Update task %(task_name)s estimation"
+msgid "Update task %(task_id)s - %(task_name)s estimation"
 msgstr ""
 
 #. module: project_scrum

@@ -164,7 +164,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page name="Burndown">
+                            <page name="Burndown" string="Burndown">
                                 <field name="burndown_ids"
                                        style="width: 100%"
                                        widget="line_chart"
@@ -241,7 +241,15 @@
             <field name="arch" type="xml">
                 <field name="user_ids" position="after">
                     <field name="user_id"/>
+                    <field name="task_id"/>
                 </field>
+                <xpath expr="//strong[hasclass('o_kanban_record_title')]" position="replace">
+                    <strong class="o_kanban_record_title">
+                        <span class="d-inline" t-esc="record.task_id.raw_value"/> - <span/>
+                        <s t-if="!record.active.raw_value"><field name="name" widget="name_with_subtask_count" class="d-inline"/></s>
+                        <t t-else=""><field name="name" widget="name_with_subtask_count" class="d-inline"/></t>
+                    </strong>
+                </xpath>
                 <!-- on click edit linked task -->
                 <kanban position="attributes">
                     <attribute name="action">action_edit_task</attribute>
@@ -288,8 +296,11 @@
             <field name="model">scrum.sprint.task</field>
             <field name="arch" type="xml">
                 <search string="Search Sprint">
-                    <field name="task_id" string="Task"/>
+                    <field name="id" string="Task" filter_domain="[('task_id', '=', raw_value)]"/>
                     <field name="user_id" string="Responsible"/>
+                    <separator/>
+                    <filter string="In Progress Tasks" name="in_progress" domain="[('planned_hours_latest', '!=', 0)]"/>
+                    <filter string="Completed Tasks" name="completed" domain="[('planned_hours_latest', '=', 0)]"/>
                 </search>
             </field>
         </record>
