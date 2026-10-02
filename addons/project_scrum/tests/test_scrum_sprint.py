@@ -127,13 +127,13 @@ class TestScrumSprint(TransactionCase):
         result = (
             self.env["scrum.sprint.task"]
             .with_context(active_model="scrum.sprint", active_id=sprint.id)
-            .web_read_group(
+            .read_group(
                 [("sprint_id", "=", sprint.id)],
                 ["user_id"],
                 ["user_id"],
             )
         )
-        none_groups = [group for group in result["groups"] if not group.get("user_id")]
+        none_groups = [group for group in result if not group.get("user_id")]
 
         self.assertTrue(none_groups)
         self.assertFalse(none_groups[0]["__fold"])

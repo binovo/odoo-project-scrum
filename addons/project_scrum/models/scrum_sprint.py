@@ -125,34 +125,27 @@ class SprintTask(models.Model):
         return users
 
     @api.model
-    def web_read_group(
+    def _read_group_fill_results(
         self,
         domain,
-        fields,
         groupby,
-        limit=None,
-        offset=0,
-        orderby=False,
-        lazy=True,
-        expand=False,
-        expand_limit=None,
-        expand_orderby=False,
+        remaining_groupbys,
+        aggregated_fields,
+        count_field,
+        read_group_result,
+        read_group_order=None,
     ):
-        result = super().web_read_group(
+        result = super()._read_group_fill_results(
             domain,
-            fields,
             groupby,
-            limit=limit,
-            offset=offset,
-            orderby=orderby,
-            lazy=lazy,
-            expand=expand,
-            expand_limit=expand_limit,
-            expand_orderby=expand_orderby,
+            remaining_groupbys,
+            aggregated_fields,
+            count_field,
+            read_group_result,
+            read_group_order=read_group_order,
         )
-        groupby_name = groupby[0].split(":")[0] if groupby else None
-        if groupby_name == "user_id":
-            for group in result["groups"]:
+        if groupby.split(":")[0] == "user_id":
+            for group in result:
                 if not group.get("user_id"):
                     group["__fold"] = False
         return result
