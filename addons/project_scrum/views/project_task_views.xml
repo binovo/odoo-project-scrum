@@ -32,6 +32,17 @@
             </field>
         </record>
 
+        <record id="view_task_kanban_last_sprint" model="ir.ui.view">
+            <field name="name">project.task.kanban.last.sprint</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <field name="tag_ids" position="before">
+                    <field name="last_sprint_id" widget="badge" decoration-info="True"/>
+                </field>
+            </field>
+        </record>
+
         <record id="action_add_to_scrum_sprint" model="ir.actions.act_window">
             <field name="name">Add To Scrum Sprint</field>
             <field name="res_model">add.to.scrum.sprint.wizard</field>

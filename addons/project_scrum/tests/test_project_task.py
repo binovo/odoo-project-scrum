@@ -53,6 +53,7 @@ class TestProjectTask(TransactionCase):
         task = self._create_task("Standalone")
         self.assertEqual(task.sprint_count, 0)
         self.assertFalse(task.sprint_ids)
+        self.assertFalse(task.last_sprint_id)
 
     def test_sprint_count_and_ids_follow_sprint_tasks(self):
         task = self._create_task("In two sprints")
@@ -93,6 +94,36 @@ class TestProjectTask(TransactionCase):
             set(action["domain"][0][2]),
             set((self.open_sprint | self.closed_sprint).ids),
         )
+
+    def test_last_sprint_is_the_one_with_the_latest_dates(self):
+        task = self._create_task("Last sprint")
+        self._add_task_to_sprint(self.closed_sprint, task)
+        self.assertEqual(task.last_sprint_id, self.closed_sprint)
+
+        self._add_task_to_sprint(self.open_sprint, task)
+        self.assertEqual(task.last_sprint_id, self.open_sprint)
+
+        self.open_sprint.sprint_task_ids.filtered(
+            lambda line: line.task_id == task
+        ).unlink()
+        self.assertEqual(task.last_sprint_id, self.closed_sprint)
+
+    def test_task_kanban_shows_last_sprint(self):
+        arch = self.env["project.task"].get_view(
+            self.env.ref("project.view_task_kanban").id, "kanban"
+        )["arch"]
+        self.assertIn('name="last_sprint_id"', arch)
+        self.assertIn('widget="badge"', arch)
+
+    def test_last_sprint_uses_sprint_id_when_dates_are_equal(self):
+        today = fields.Date.today()
+        first = self._create_sprint(date_begin=today, date_end=today)
+        second = self._create_sprint(date_begin=today, date_end=today)
+        task = self._create_task("Tie break")
+        self._add_task_to_sprint(first, task)
+        self._add_task_to_sprint(second, task)
+
+        self.assertEqual(task.last_sprint_id, second)
 
     def test_update_estimation_wizard_defaults_to_task_stage(self):
         """The wizard stage is the related task stage."""

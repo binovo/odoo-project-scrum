@@ -21,12 +21,29 @@ class Task(models.Model):
         string="Sprints",
     )
     sprint_count = fields.Integer(compute="_compute_sprint_ids")
+    last_sprint_id = fields.Many2one(
+        "scrum.sprint",
+        string="Last Sprint",
+        compute="_compute_last_sprint_id",
+        help="Most recent sprint this task was assigned to.",
+    )
 
     @api.depends("sprint_task_ids.sprint_id")
     def _compute_sprint_ids(self):
         for task in self:
             task.sprint_ids = task.sprint_task_ids.sprint_id
             task.sprint_count = len(task.sprint_ids)
+
+    @api.depends(
+        "sprint_task_ids.sprint_id.date_begin",
+        "sprint_task_ids.sprint_id.date_end",
+    )
+    def _compute_last_sprint_id(self):
+        for task in self:
+            task.last_sprint_id = task.sprint_ids.sorted(
+                key=lambda sprint: (sprint.date_end, sprint.date_begin, sprint.id),
+                reverse=True,
+            )[:1]
 
     def action_view_sprints(self):
         self.ensure_one()

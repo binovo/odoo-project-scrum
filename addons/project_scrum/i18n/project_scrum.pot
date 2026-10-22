@@ -674,6 +674,18 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: project_scrum
+#: model:ir.model.fields,field_description:project_scrum.field_project_task__last_sprint_id
+#: model:ir.model.fields,field_description:project_scrum.field_scrum_sprint_task__last_sprint_id
+msgid "Last Sprint"
+msgstr ""
+
+#. module: project_scrum
+#: model:ir.model.fields,help:project_scrum.field_project_task__last_sprint_id
+#: model:ir.model.fields,help:project_scrum.field_scrum_sprint_task__last_sprint_id
+msgid "Most recent sprint this task was assigned to."
+msgstr ""
+
+#. module: project_scrum
 #: model:ir.model.fields,field_description:project_scrum.field_scrum_sprint_task__date_last_stage_update
 msgid "Last Stage Update"
 msgstr ""
