@@ -82,10 +82,9 @@ $$ LANGUAGE SQL IMMUTABLE;
 -- for a possibly premature optimization does not seem justified.
 DROP VIEW IF EXISTS resource_daily_attendance;
 CREATE VIEW resource_daily_attendance AS (
-    SELECT rc.id * 100000000
-               + EXTRACT(YEAR  FROM ed.date) * 10000
-               + EXTRACT(MONTH FROM ed.date) *   100
-               + EXTRACT(DAY   FROM ed.date) *     1 AS id,
+    SELECT (
+               ('0x' || SUBSTR(MD5('RDA' || rc.id || ed.date), 1, 12))::numeric
+           ) AS id,
            rc.id AS calendar_id,
            ed.date AS date,
            RANGE_AGG(
@@ -113,8 +112,8 @@ CREATE VIEW resource_daily_attendance AS (
                        ELSE
                            TRUE
                    END
-               AND (rca.date_from IS NULL OR rca.date_from < ed.date)
-               AND (rca.date_to   IS NULL OR ed.date       < rca.date_to)
+               AND (rca.date_from IS NULL OR rca.date_from <= ed.date)
+               AND (rca.date_to   IS NULL OR ed.date       <= rca.date_to)
     WHERE rca.display_type IS NULL
     GROUP BY rc.id, ed.date
 );
